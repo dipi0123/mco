@@ -1,0 +1,22 @@
+# ─── Claude: 로컬 전용 설정만 제외 (메모리·공유설정은 추적) ───
+.claude/settings.local.json
+.claude/**/*.local.json
+
+# ─── OS / 에디터 / 오피스 잠금 파일 ───
+.DS_Store
+._*
+*.swp
+*~
+.~lock.*#
+.fuse_hidden*
+
+# ─── 임시 ───
+*.tmp
+*.bak
+
+# >>> mco: code projects (managed separately) >>>
+# 코드 프로젝트 = 독립 git repo, 별도 협업자 access.
+# 상위 문서 repo에선 제외하고 signpost README 한 장만 추적.
+/Development/*
+!/Development/README.md
+# <<< mco: code projects <<<
