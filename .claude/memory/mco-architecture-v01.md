@@ -1,6 +1,6 @@
 ---
 name: mco-architecture-v01
-description: "아키텍처 코어 합의(2026-07-11, P1~P8 반영 완료) — 정본=텍스트 레코드·벡터=파생 인덱스; Postgres 한 채; 검색 5채널(Kiwi 형태소 FTS·pg_trgm·정확키·pgvector·gen_queries)+RRF; 2계층 기억+승격·강등; 읽기 2티어(쿼리시 LLM 금지); 쓰기=자동 기록+undo; 모델 확정: 2.5 Flash-Lite 핀·bge-m3·Qwen3-Reranker(전부 한국어 벤치 승격제); 관문=정밀도 실험+호출률+부품 벤치 3건"
+description: "아키텍처 코어 합의(2026-07-11, P1~P8 반영 완료) — 정본=텍스트 레코드·벡터=파생 인덱스; Postgres 한 채; 검색 5채널(Kiwi 형태소 FTS·pg_trgm·정확키·pgvector·gen_queries)+RRF; 2계층 기억+승격·강등; 읽기 2티어(쿼리시 LLM 금지); 쓰기=자동 기록+undo; 모델 확정: 2.5 Flash-Lite 핀·bge-m3·Qwen3-Reranker(전부 한국어 벤치 승격제); 관문=정밀도 실험(+07-12 k 스윕·원자 임베딩 A/B·집계 전수 질의)+호출률+부품 벤치 3건(임베딩 후보 +Qwen3-Emb)"
 metadata:
   type: project
 ---
@@ -12,10 +12,10 @@ metadata:
 - **2계층 기억**: 설정성(상시 주입 T0/T1, 상한 강제) vs 사건성(T2 검색·T3 아카이브). "확실히 필요한 건 주입, 아마 필요한 건 검색." 승격/강등 순환.
 - **쓰기(P2)**: 게이트→스코프→충돌검사→**자동 커밋+즉시 undo**. 승인은 충돌·교차 스코프만, 미드태스크 인터럽트 금지, 주간 changelog, 인박스=예외 처리함. ADD-only+invalid_at.
 - **읽기 2티어**: 사전 조립 브리핑 팩(쿼리 시점 LLM 금지, ~50–200ms) + 딥서치(5채널→RRF→리랭커). 안티패턴은 적시 주입.
-- **모델 확정(P8)**: 추출 = **Gemini 2.5 Flash-Lite 핀**(한국어+코드스위칭 벤치 게이트 조건부, 스왑 후보 GPT-5-mini KMMLU 76.47) / 임베딩 기본값 = **bge-m3**(DeepInfra $0.01/1M — Gemini 대비 15분의 1, Ko-MTEB IR 79.30 실증) / 리랭커 1순위 = **Qwen3-Reranker**(DeepInfra $0.01/1M, 한국어 실측 1위 4B 0.8324), 폴백 bge-reranker-v2-m3. Gemini·Voyage·KURE는 자체 벤치 승격제.
+- **모델 확정(P8)**: 추출 = **Gemini 2.5 Flash-Lite 핀**(한국어+코드스위칭 벤치 게이트 조건부, 스왑 후보 GPT-5-mini KMMLU 76.47) / 임베딩 기본값 = **bge-m3**(DeepInfra $0.01/1M — Gemini 대비 15분의 1, Ko-MTEB IR 79.30 실증) / 리랭커 1순위 = **Qwen3-Reranker**(DeepInfra $0.01/1M, 한국어 실측 1위 4B 0.8324), 폴백 bge-reranker-v2-m3. Gemini·Voyage·KURE·Qwen3-Embedding(07-12 후보 추가)은 자체 벤치 승격제.
 - **연결층**: 무상태 MCP(07-28 개정 대응, Tasks API 금지), OAuth DCR+CIMD, Workers+Hyperdrive 풀링 필수, 디렉토리 등재=출시 요건, 호출 의존 3중 완화(스니펫 원클릭 설치·self-test·호출률 텔레메트리).
 - **비용**: 헤비 유저 월 $0.75–1.5, 웜스타트 $1–2(bge-m3 시 임베딩분 ~$0.05).
-- **관문(전부 구현 전 API 수준)**: ⓐ 부품 벤치 3건(리랭커·임베딩·추출 — 공개 하네스: instructkr·AutoRAGRetrieval·Ko-StrategyQA·KURE) ⓑ 게이트·선택 정밀도 실험(베이스라인 full-context·BM25 +10점, 기권 클래스, 한국어 슬라이스) ⓒ 호출률 A/B. 라이브 라벨 = undo·제외·수정·충돌 판정.
+- **관문(전부 구현 전 API 수준)**: ⓐ 부품 벤치 3건(리랭커·임베딩·추출 — 공개 하네스: instructkr·AutoRAGRetrieval·Ko-StrategyQA·KURE) ⓑ 게이트·선택 정밀도 실험(베이스라인 full-context·BM25 +10점, 기권 클래스, 한국어 슬라이스 + 07-12 추가: 최종 주입 k 스윕 5/10/20·원자 임베딩 입력 A/B — [[mco-contextual-retrieval-scan]] · 집계·전수 질의 슬라이스 — [[mco-agent-failure-scan]]) ⓒ 호출률 A/B. 라이브 라벨 = undo·제외·수정·충돌 판정.
 
 Why: "여러 모델을 오가도 일관 추론" = 입력 일관성(같은 브리핑 팩). UX 예산에서 역산 + 2회 적대적 검증으로 교정 완료.
 

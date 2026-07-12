@@ -1,6 +1,6 @@
 ---
 name: mco-wedge-web-connector
-description: "2026-07-11 웨지 재개정(차터 §7 개정 대기) — 일반 사용자 '웹 딸깍' 우선: Claude 커넥터가 소거법상 유일 열린 문(무료 포함·모바일·무료는 커넥터 1개 제한), 하네스는 심화 표면으로 병행, 코어 MCP 서버는 하나"
+description: "2026-07-11 웨지 재개정(차터 §7 반영 완료 v0.3) — 일반 사용자 '웹 딸깍' 우선: Claude 커넥터가 소거법상 유일 열린 문(무료 포함·모바일·무료는 커넥터 1개 제한), 하네스는 심화 표면으로 병행, 코어 MCP 서버는 하나"
 metadata:
   type: project
 ---
@@ -14,4 +14,4 @@ metadata:
 
 Why: Ethan 방향 지시("일반 클로드·GPT 웹에서 MCP 플러그인 딸깍, 인프라 설정 없이 어디서든 통일") + 플랫폼 문(門) 정책 실측이 일치.
 
-How to apply: MVP 스펙에서 1차 표면 = Claude 커넥터 + 웹 대시보드, 병행 = Claude Code 플러그인·Hermes 프로바이더. 차터 §7 v0.3 갱신 시 이 내용 반영. 감시: Claude 무료 커넥터 정책 변화, ChatGPT Apps 심사 정책. [[mco-mvp-direction]] [[mco-architecture-v01]]
+How to apply: MVP 스펙에서 1차 표면 = Claude 커넥터 + 웹 대시보드, 병행 = Claude Code 플러그인·Hermes 프로바이더. 차터 §7 v0.3 반영 완료(2026-07-12). 감시: Claude 무료 커넥터 정책 변화, ChatGPT Apps 심사 정책. [[mco-mvp-direction]] [[mco-architecture-v01]]

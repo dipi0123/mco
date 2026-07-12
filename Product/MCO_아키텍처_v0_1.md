@@ -49,6 +49,7 @@ content      : 1~3문장 자연어 (모델 불가지론)
 type         : 사실 | 선호 | 결정(+근거+기각된 대안) | 실패/안티패턴 | 약속 | 에피소드요약
 scope        : 계정 / 법인 / 프로젝트 / 에이전트        ← 오염 페인(벽). 태그가 아니라 권한 강제
 provenance   : 출처 세션·날짜 + 단언 주체(유저 발화 vs 에이전트 추론)  ← "왜 알아?" 감사
+trust_level  : 사람 단언 > 검증된 런 산출 > 비신뢰 콘텐츠 유래    ← 저신뢰는 고권한 문맥 자동 주입 금지(보안 통제 ①)
 ttl_class    : 불변 | 저부패(선호·스택) | 고부패(현재 상태) | 만기고정(계약·마감)
 bi-temporal  : created_at / valid_at / invalid_at / expired_at   ← Graphiti 패턴, 삭제 대신 무효화
 status       : active | deprecated | conflicted
@@ -82,9 +83,9 @@ gen_queries  : 쓰기 시점 생성 검색 쿼리 3~5개(별도 임베딩)      
 
 - **쓰기 경로(①–④)**: **Gemini 2.5 Flash-Lite에 모델 핀**($0.10/$0.40 per 1M — 3.1 Flash-Lite는 $0.25/$1.50로 비용 2.5~3.75×, §7 비용 모델은 2.5 기준. 검증 P4) — 구조화 출력 테스트 100% 유효 JSON, [Honcho가 파인튜닝해 프로덕션 운용하는 베이스](https://plasticlabs.ai/blog/research/Benchmarking-Honcho). 대안 GPT-5-nano($0.05/$0.40). **한국어+코드스위칭 자체 벤치 게이트 조건부**(Flash-Lite 한국어 공개 벤치 부재 — 증거 기반 스왑 후보 = GPT-5-mini, KMMLU 76.47 실측; 벤치에 한·영 혼용 케이스 + 출력 언어·스키마 안정성 assert 포함. P8).
 - **읽기 경로(⑤)**: 티어1 = 사전 조립(LLM은 백그라운드에서만), 티어2 = 리랭커.
-- **임베딩(P8 확정)**: **기본값 = bge-m3** — 한국어 실증(Ko-MTEB IR 79.30, recall@10 0.792) + 관리형 실재([DeepInfra $0.01/1M](https://deepinfra.com/BAAI/bge-m3/api)·Cloudflare Workers AI $0.012/1M) = **Gemini($0.15) 대비 15분의 1 비용**. 참고: OpenAI 3-large는 한국어 [리콜 −17.1%](https://github.com/nlpai-lab/KURE). Gemini embedding·voyage-4-lite(둘 다 한국어 공개 실측 0)·KURE-v1(+1.5 NDCG이나 관리형 호스트 없음)은 **자체 한국어 벤치에서 이기면 승격**. 주의: Gemini Embedding 2는 001과 공간 비호환(교체=전량 재임베딩 — 텍스트 정본 규칙이 배치 작업화), Gemini 배치 캡 500k tok. MRL 1024.
+- **임베딩(P8 확정)**: **기본값 = bge-m3** — 한국어 실증(Ko-MTEB IR 79.30, recall@10 0.792) + 관리형 실재([DeepInfra $0.01/1M](https://deepinfra.com/BAAI/bge-m3/api)·Cloudflare Workers AI $0.012/1M) = **Gemini($0.15) 대비 15분의 1 비용**. 참고: OpenAI 3-large는 한국어 [리콜 −17.1%](https://github.com/nlpai-lab/KURE). Gemini embedding·voyage-4-lite(둘 다 한국어 공개 실측 0)·KURE-v1(+1.5 NDCG이나 관리형 호스트 없음, 2024-12 이후 갱신 정체)·Qwen3-Embedding-0.6B/4B(Apache-2.0·MRL, 다국어 MTEB 상위이나 한국어 공개 실측 얇음 — 2026-07-12 후보 추가)는 **자체 한국어 벤치에서 이기면 승격**. 주의: Gemini Embedding 2는 001과 공간 비호환(교체=전량 재임베딩 — 텍스트 정본 규칙이 배치 작업화), Gemini 배치 캡 500k tok. MRL 1024.
 - **파인튜닝 경로(라벨 축적 후)**: Fireworks LoRA 훈련 $0.50/1M tok·파인튜닝 모델 서빙 추가비 0, [증류로 5–30× 비용 절감 실증](https://www.tensorzero.com/blog/distillation-programmatic-data-curation-smarter-llms-5-30x-cheaper-inference/). 자산의 본체 = 스키마 + 정밀도 평가셋 + 사용자 라벨(차터 §9 가설 유지).
-- **보안**: 주입 전 스캔(프롬프트 인젝션·크리덴셜 패턴), 스코프 = 정책 강제(태그 필터 아님).
+- **보안 — 통제 6항 (2026-07-12 합의, 정본: `.claude/memory/mco-security-model.md`)**: 전제 = MCO는 [lethal trifecta](https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/)(비공개 데이터 접근 × 비신뢰 콘텐츠 노출 × 외부 통신)의 세 변을 구조로 갖는 제품 — write-back이 비신뢰 유래 콘텐츠를 흡수하고 그 기억이 외부 통신 가능한 에이전트에 주입된다. **방어 본체 = 아키텍처 제약, 스캔 = 보조**(가드레일 95% 차단 = 앱보안 낙제 — Willison). ① 기억 신뢰 티어링: provenance에 trust_level(사람 단언 > 검증된 런 산출 > 비신뢰 유래), 저신뢰는 고권한 문맥 자동 주입 금지 — 강제 지점 = 게이트·선택(역할 ①⑤), 스키마 v0.1 필드 ② write-back = 중대 행동: 런은 자기 스코프에만 write, 교차 스코프 write는 예외 없이 사람 승인(RLS read 격리와 대칭 — confused-deputy 봉쇄) ③ 주입 전 스캔(인젝션·크리덴셜 — Hermes 차용): 유지하되 보조로 명기 ④ 대시보드: 인증 자체 빌드 금지 — [identity-aware proxy](https://www.pomerium.com/blog/secure-access-for-mcp) 앞단 게이트(§9 미결 ⓑ의 입력) ⑤ 신뢰 헤더 규율: forwarded 계열은 엣지 세팅분만 신뢰, 클라이언트 신원 헤더는 경계에서 스트립([OpenClaw trusted-proxy 사례](https://github.com/openclaw/openclaw)의 표준 함정 — 헤더 스푸핑 = 인증 무력화) ⑥ 제로 상태 인증 테스트: 온보딩·OAuth·첫 5분 경로는 신규 미연결 계정으로 검증. 스코프 = 정책 강제(태그 필터 아님)는 §4 데이터층(RLS)과 함께 유지.
 
 ## 7. 비용 모델 (인프라 성립성 — pricing 아님)
 
@@ -93,9 +94,9 @@ gen_queries  : 쓰기 시점 생성 검색 쿼리 3~5개(별도 임베딩)      
 ## 8. 정밀도 실험 프로토콜 (관문 — 사고 흐름 ④의 판정 수단)
 
 1. **게이트(①)**: 실제 트랜스크립트 층화 샘플 300–500청크 → "기억할 가치" 이진 루브릭(Claude Code 휴리스틱+Devin Knowledge 카테고리 시드) → 2–3인 라벨(파일럿 κ 확인, 5–15% 이중 라벨) → precision/recall.
-2. **선택(⑤)**: LongMemEval 2층 — 회수 P/R@k({10,20,50}) + 최종 QA 정확도(고정 LLM 저지, ~100건 인간 검증). **베이스라인 = full-context와 BM25/grep 둘 다** ([LoCoMo에서 full-context 73%가 mem0 68%를 이김](https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/)). 킬 기준: 최강 염가 베이스라인 +10점. **모든 점수는 토큰/쿼리·p95와 쌍으로 보고.**
+2. **선택(⑤)**: LongMemEval 2층 — 회수 P/R@k({10,20,50}) + 최종 QA 정확도(고정 LLM 저지, ~100건 인간 검증). **베이스라인 = full-context와 BM25/grep 둘 다** ([LoCoMo에서 full-context 73%가 mem0 68%를 이김](https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/)). 킬 기준: 최강 염가 베이스라인 +10점. **모든 점수는 토큰/쿼리·p95와 쌍으로 보고.** **+ 최종 주입 k 스윕(5/10/20, 리랭커 후 주입 개수별 QA 정확도 — 2026-07-12 추가)**: 문서 RAG의 top-20 권고([Anthropic Contextual Retrieval](https://www.anthropic.com/news/contextual-retrieval))와 반대 방향 실증([Chroma context rot](https://www.trychroma.com/research/context-rot): 방해 청크 1개도 유해, 집중 ~300tok ≫ 전체 113k)이 충돌 — 기억 주입 상한은 실측으로 확정. **+ 집계·전수(aggregation/whole-set) 질의 슬라이스(2026-07-12 추가 — 에이전트 실패 기법 스캔)**: 정답이 관련 기억 전체의 집계·카운트·"모든 X"·교차 스코프 합산을 요구하는 질의에서 벡터 top-k 샘플링의 조작률 측정 — 유사도 top-k가 전수를 추측하는 실패 모드(AWS Graph-RAG 데모의 우리식 번역: 유사도 검색 vs 구조적 질의). 구조적 질의 경로(pg 집계·관계 조인·엔티티 엣지, Neo4j 도입 아님)가 조작을 줄이는지 A/B, 전수 불가 시 §8-3 기권(정직한 제로)과 연결. 충돌③(모순 페어 F1, 아래 3)과 별 실패 모드 — 중복 아님.
 3. **기권(abstain) 클래스 포함** — 꺼낼 게 없으면 침묵(노이즈 철학의 시험). 충돌③·신선도④ = 모순 페어 합성 F1.
-4. **한국어 슬라이스 별도 채점 + 부품 벤치 3건 통합(P8)** — 리랭커(Qwen3 vs bge-reranker vs Voyage) / 임베딩(bge-m3 vs Gemini vs voyage-lite vs KURE) / 추출(Flash-Lite vs GPT-5-nano·mini, 한·영 코드스위칭 + 출력 언어·스키마 안정성 assert). 공개 하네스 재사용(instructkr reranker bench·AutoRAGRetrieval·Ko-StrategyQA·KURE). **전부 구현 전 API 수준 평가 — 제품 빌드 불필요.**
+4. **한국어 슬라이스 별도 채점 + 부품 벤치 3건 통합(P8)** — 리랭커(Qwen3 vs bge-reranker vs Voyage) / 임베딩(bge-m3 vs Gemini vs voyage-lite vs KURE **vs Qwen3-Embedding-0.6B/4B** — [2025-06 공개](https://qwenlm.github.io/blog/qwen3-embedding/), Apache-2.0·MRL·instruction-aware, 다국어 MTEB 상위이나 한국어 공개 실측 얇음 → 2중 게이트 동일 적용, 2026-07-12 후보 추가) / 추출(Flash-Lite vs GPT-5-nano·mini, 한·영 코드스위칭 + 출력 언어·스키마 안정성 assert). 공개 하네스 재사용(instructkr reranker bench·AutoRAGRetrieval·Ko-StrategyQA·KURE). **+ 원자 임베딩 입력 A/B(2026-07-12 추가)**: 원자 본문 단독 임베딩 vs 스코프·엔티티 메타 프리픽스 결합 임베딩 — 짧은 원자의 dense 유사도 신호 부족 가설(컨텍스추얼 리트리벌의 우리식 번역) 검증, **gen_queries 채널과의 중복 여부 판정 목적**(무효과면 "원자 스키마+gen_queries로 충분" 증거로 기록). 한국어 슬라이스 포함. **전부 구현 전 API 수준 평가 — 제품 빌드 불필요.**
 5. 출시 후 라이브 라벨 루프(P2 반영): 자동 기록에 대한 사용자의 **undo·제외·수정 액션 + 충돌 판정**이 라벨 — 승인 클릭 대신 예외 행동에서 정밀도를 측정하고 평가셋을 축적(복리 자산 루프).
 6. **호출률 계측(검증 P6)**: 웹 표면에서 memory_brief 선제 호출률 측정 — 사용자 지침 스니펫 유/무 A/B. 대시보드 recall-rate 지표의 기준선이자 플랫폼 회귀 감시 기준.
 
@@ -104,9 +105,9 @@ gen_queries  : 쓰기 시점 생성 검색 쿼리 3~5개(별도 임베딩)      
 - **스펙 처닝**: 2026-07-28 MCP 파괴적 개정 — 무상태 설계로 흡수, 출시 전 RC 검증.
 - **claude.ai 무음 실패** → 전 레이어 로깅 1일차.
 - **ChatGPT Apps 정책**: 데이터 최소화 조항(건강·결제 수집 금지)과 "뭐든 기억" 제품의 긴장 — 진출 시 스코프 필터 설계 필요(기록만, 후순위).
-- **미결**: ⓐ 한국어 부품 벤치 3건(§8-4 — 기본값은 확정: bge-m3·Qwen3-Reranker·Flash-Lite, 벤치는 승격/스왑 판정용) ⓑ 대시보드 스택(Supabase auth 공유 시 저비용) ⓒ 페르소나 상세·첫 5분 플로우 화면 수준 설계 ⓓ 차터 v0.3 반영 ⓔ zerank-2 상업 라이선스 협의(선택).
+- **미결**: ⓐ 한국어 부품 벤치 3건(§8-4 — 기본값은 확정: bge-m3·Qwen3-Reranker·Flash-Lite, 벤치는 승격/스왑 판정용) ⓑ 대시보드 스택(Supabase auth 공유 시 저비용 + **IAP 앞단 게이트 전제 — §6 보안 통제 ④ 입력**) ⓒ 페르소나 상세·첫 5분 플로우 화면 수준 설계 ⓓ 차터 v0.3 반영 ⓔ zerank-2 상업 라이선스 협의(선택).
 - **프로세스 규칙(P8f)**: 모든 인프라·모델 선택에 **2중 게이트** — ⓐ 관리형 호환성 매트릭스 확인 ⓑ 한국어 실측 근거 확인(없으면 자체 벤치 게이트 뒤로). 이 규칙 부재가 P1(ParadeDB)·P8(Voyage·Gemini 임베딩)의 공통 원인이었다.
-- **개정 이력**: 2026-07-11 검증 리포트 P1~P6 반영(검색 스택 교체·기록-후-되돌리기·디렉토리 출시 요건·리랭커/모델 핀·풀링·호출률 계측) · 같은 날 한국어 검색 스택 P8a~P8f 반영(Kiwi 형태소 레그·5채널 확정·Qwen3-Reranker 1순위·bge-m3 기본값·추출 한국어 게이트·2중 게이트). 상세: `docs/리서치/MCO_검증리포트_v0_1.md` · `docs/리서치/MCO_한국어검색스택_v0_1.md`.
+- **개정 이력**: 2026-07-11 검증 리포트 P1~P6 반영(검색 스택 교체·기록-후-되돌리기·디렉토리 출시 요건·리랭커/모델 핀·풀링·호출률 계측) · 같은 날 한국어 검색 스택 P8a~P8f 반영(Kiwi 형태소 레그·5채널 확정·Qwen3-Reranker 1순위·bge-m3 기본값·추출 한국어 게이트·2중 게이트) · **2026-07-12 보안 통제 6항 반영**(§6 보안 확장 — trifecta 전제·신뢰 티어링·write-back 중대행동·IAP 게이트·신뢰 헤더·제로 상태 테스트, 정본 `.claude/memory/mco-security-model.md`) · **2026-07-12 컨텍스추얼 검색 동향 점검 반영(기능 항목만)** — §8-2 최종 주입 k 스윕·§8-4 원자 임베딩 입력 A/B·임베딩 벤치 후보 +Qwen3-Embedding(§6·§8-4). 캐시 친화 팩 직렬화는 스키마 v0.1 설계 입력으로 보류, 롱컨텍스트+캐싱 반론 방어는 차터 v0.3 후보로 이관(근거: `docs/리서치/MCO_컨텍스추얼검색동향_v0_1.md`). · **2026-07-12 에이전트 실패 기법 스캔 반영(기능 항목만)** — §8-2 집계·전수 질의 슬라이스 추가(벡터 top-k 샘플링 조작률 vs 구조적 질의, 기권 연결). Semantic Tool Selection=역할⑤·Neurosymbolic Guardrails=§6 보안 통제①②·Multi-agent=write-back 게이트로 이미 흡수, 툴 라우터 확장은 오케스트레이션 가드레일로 기각(근거: `.claude/memory/mco-agent-failure-scan.md`). 상세: `docs/리서치/MCO_검증리포트_v0_1.md` · `docs/리서치/MCO_한국어검색스택_v0_1.md`.
 
 ---
 

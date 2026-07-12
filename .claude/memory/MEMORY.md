@@ -19,9 +19,12 @@
 
 ## 프로덕트 방향
 
-- [MVP direction](mco-mvp-direction.md) — v0.2 웨지 스왑: 하네스 플러그인(Claude Code·Codex) + MCP 서버 + 결정 인박스 대시보드; 브라우저 확장 phase 2; 타깃 = 코딩 에이전트 파워유저; 최우선 검증 = write-back 정밀도. **→ 2026-07-11 재개정: [[mco-wedge-web-connector]] 참조.**
-- [Wedge: web connector first](mco-wedge-web-connector.md) — 2026-07-11 재개정(차터 §7 대기): 일반 사용자 웹 딸깍 우선 — Claude 커넥터가 소거법상 유일 열린 문(무료 1커넥터 슬롯); 하네스·Hermes = 심화 표면 병행; 코어 서버 하나.
+- [MVP direction](mco-mvp-direction.md) — v0.3: 1차 표면 = Claude 커넥터+웹 대시보드, 하네스·Hermes 병행 심화; 페르소나 = 컨텍스트가 돈인 프로슈머(코딩 파워유저 = 경로 A 채널); 경로 A·B 병렬; 최우선 검증 = write-back 정밀도.
+- [Wedge: web connector first](mco-wedge-web-connector.md) — 2026-07-11 재개정(차터 §7 반영 v0.3): 일반 사용자 웹 딸깍 우선 — Claude 커넥터가 소거법상 유일 열린 문(무료 1커넥터 슬롯); 하네스·Hermes = 심화 표면 병행; 코어 서버 하나.
 - [Architecture v0.1](mco-architecture-v01.md) — 2026-07-11(P1~P8 반영 완료): 텍스트 정본·벡터 인덱스; 검색 5채널(Kiwi 형태소 FTS·pg_trgm·정확키·pgvector·gen_queries); 2계층 기억; 읽기 2티어; 자동 기록+undo; 모델 확정 = 2.5 Flash-Lite 핀·**bge-m3**·**Qwen3-Reranker**(전부 한국어 벤치 승격제); 관문 = 부품 벤치 3건+정밀도 실험+호출률(전부 구현 전). 정본: `Product/MCO_아키텍처_v0_1.md` · 근거: `docs/리서치/MCO_검증리포트_v0_1.md`·`MCO_한국어검색스택_v0_1.md`.
+- [Contextual retrieval scan](mco-contextual-retrieval-scan.md) — 2026-07-12: 원문(2024-09) 기법은 기존 설계가 흡수·초과; 적용(기능 한정) = §8 최종 주입 k 스윕·원자 임베딩 입력 A/B + 임베딩 벤치 후보 Qwen3-Emb; 보류 = 캐시 친화 팩(스키마 입력); 이관 = 롱컨텍스트 반론(차터 v0.3); 관망 = voyage-context-4·memory tool GA. 정본: `docs/리서치/MCO_컨텍스추얼검색동향_v0_1.md`.
+- [Agent failure scan](mco-agent-failure-scan.md) — 2026-07-12: AWS 5+1 환각 방지 기법(Strands+AgentCore) 3단 판정; 4/5 흡수·초과(Semantic=역할⑤·Guardrails=보안 통제①②·Multi-agent=게이트); 넷-뉴 = 집계·전수 질의 조작(§8-2 슬라이스); AgentCore = 담장 안 풀스택(경쟁 감시 등재); 툴 라우터 확장 기각·벤더 수치(73%) 대외 인용 금지.
+- [Security model: trifecta controls](mco-security-model.md) — 전제: MCO = lethal trifecta 정중앙(민감 메모리 × 비신뢰 유래 write-back × 외부 통신 주입), 방어 본체 = 아키텍처 제약; 통제 6항(신뢰 티어링·write-back 스코프 고정·스캔=보조·대시보드 IAP 게이트·신뢰 헤더 규율·제로 상태 테스트) = 차터 §9 #6·인프라 §9 #5 확정 입력.
 - [Ideation 2026-07-11](mco-ideation-2026-07-11.md) — 페인 서열(오염>무영향>부재); 발산 14 재배치(⑨⑩=슬롯 자산, ②⑥=출력 앱); 기각 기록(회의 수확기→회의 전 브리핑 반전, GB 구독, 에스크로 보류).
 - [Manufacturing positioning](mco-manufacturing-positioning.md) — 제조 GTM: 'LLM 독립형 메모리 레이어' 표현 금지 → '설비·품질·작업자 이력을 기억하고 상황 맞는 과거 사례를 꺼내주는 제조 메모리 컨텍스트'(Factory Memory Context).
 
