@@ -12,7 +12,8 @@
 
 ## 경쟁·시장
 
-- [Competitive landscape 2026-07](mco-competitive-landscape.md) — 이동성 단독 차별점 사망(혼잡); 사용자 소유·벤더 횡단 스코프 공백; 조합 해자 전부 하는 곳 없음; 위협 1티어 = mem0·Anthropic. 정본: `docs/리서치/MCO_경쟁지형_v0_1.md`.
+- [Competitive landscape 2026-07](mco-competitive-landscape.md) — 이동성 단독 차별점 사망(혼잡); 사용자 소유·벤더 횡단 스코프 공백; 조합 해자 전부 하는 곳 없음; 위협 1티어 = mem0·Anthropic·AWS AgentCore. 정본: `docs/리서치/MCO_경쟁지형_v0_1.md`.
+- [Watchlist](mco-watchlist.md) — 분기 점검 단일 취합: 킬 트리거 3(정밀도+10 실패·OpenAI Memory API·Nous 번들) + 감시 항목(빅테크 메모리 확장·메모리 오픈표준·경쟁사 행보). 출처 = viability·competitive·사업성 §8·경쟁지형 §6.
 - [Hermes verdict](mco-hermes-verdict.md) — 2026-07-11: Hermes = 경쟁자 아닌 3역(수요 증명·커모디티화·유통 채널); 정면 경쟁 금지; "기억 가진 에이전트 하나 vs 모든 에이전트가 공유하는 기억 하나"; Hermes Cloud(07-07) 주시.
 - [Viability verdict](mco-viability-verdict.md) — 2026-07-11: 저장 스택 커모디티(NO-GO), 경쟁력=게이트·정밀 선택·강제 스코프·라벨 축적; GB 저장 구독 기각; 경로 A(슬롯)·B(서류 컴포저) 병렬 실험; 킬 트리거 3. 정본: `docs/리서치/MCO_사업성분석_v0_1.md`.
 - [Term collision: Passport](mco-term-collision-passport.md) — 'Memory Passport' 외부 충돌(MemoryLake 제품명·mem0 비전 문구); 정본 유지하되 재검토 안건, 대외 헤드라인 사용 금지.

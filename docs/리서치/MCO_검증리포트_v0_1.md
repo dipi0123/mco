@@ -52,16 +52,16 @@
 | T4 | Supabase + ParadeDB pg_search | **반박 — 결함** | Supabase 미지원(별도 인스턴스 복제 = RLS 상실), **Neon은 2026-03 deprecated**, RDS/Aurora 미지원, ParadeDB SaaS 없음. **대체(P1)**: Supabase 네이티브 하이브리드(tsvector GIN + pgvector + RRF — Honcho의 실제 프로덕션 구성). **한국어 주의**: Supabase에 한국어 토크나이저 없음 → 렉시컬 레그 = pg_trgm/`simple` 구성; 참고로 mem0 BM25는 영어 하드코딩(CJK 무음 무력화, [#4884](https://github.com/mem0ai/mem0/issues/4884)) — **한국어 하이브리드 검색 자체가 경쟁 공백** |
 | T5 | pgvector 0.8 iterative scan | **확인** | AWS 실측: 필터드 recall 1–10%→100%, 최대 9.4× — 튜닝 노브(max_scan_tuples·테넌트 파티셔닝) 문서화 |
 | T6 | 사전 조립 브리핑(2티어 읽기) | **확인** | Honcho 패턴 채택: 쓰기 시 enqueue 증분 갱신 + queue_status 노출(신선도 관측) — cron 재빌드 아님 |
-| T7 | 리랭커 zerank-2 | **수정 필요** | **가중치 비상업 라이선스**(상업 셀프호스트는 협의 필요, 시드단계 스타트업 리스크). **1순위 교체 → Voyage rerank-2.5-lite($0.02/1M, 무료 200M)**, 폴백 bge-reranker-v2-m3(T4급 소형 GPU ~80ms — CPU 불가) |
+| T7 | 리랭커 zerank-2 | **수정 필요** | **가중치 비상업 라이선스**(상업 셀프호스트는 협의 필요, 시드단계 스타트업 리스크). **1순위 교체 → Voyage rerank-2.5-lite($0.02/1M, 무료 200M)**, 폴백 bge-reranker-v2-m3(T4급 소형 GPU ~80ms — CPU 불가) *(→ 2026-07-11 P8: Qwen3-Reranker로 1순위 재교체, Voyage는 한국어 무실측이라 벤치 게이트 뒤로 — 정본 `MCO_한국어검색스택_v0_1.md`)* |
 | T8 | Gemini 임베딩·Flash-Lite | **수정 필요** | Gemini 임베딩의 **한국어 정면 비교 데이터 부재**(KURE 벤치에 미포함) → 커밋 전 자체 한국어 벤치 필수. Gemini Embedding 2 GA = 공간 비호환(전량 재임베딩 = 이주 비용 항목) · **임베딩 배치 캡 500k 토큰/배치**(웜스타트 배치 설계 제약). Flash-Lite 구조화 출력은 재확증 |
-| T9 | 비용 모델·지연 | **확인 (조건부)** | 수치 재계산 일치(세션 $0.003–0.006, 웜스타트 $1.5–1.7). **단 2.5 Flash-Lite에 모델 핀** — 3.1은 2.5–3.75×. 지연: Workers→PG는 **Hyperdrive/풀링 필수**(비풀링 크로스리전 ~625ms+ = 예산 초과) |
+| T9 | 비용 모델·지연 | **확인 (조건부)** | 수치 재계산 일치(세션 $0.003–0.006, 웜스타트 $1.5–1.7). *(정본 §7·인프라 §5는 이후 세션당 $0.005–0.01로 상향 — 2.5 Flash-Lite 핀 반영값을 정본으로 사용.)* **단 2.5 Flash-Lite에 모델 핀** — 3.1은 2.5–3.75×. 지연: Workers→PG는 **Hyperdrive/풀링 필수**(비풀링 크로스리전 ~625ms+ = 예산 초과) |
 
 ## 4. 패치 리스트 (v0.1 문서 수정 권고 — "적용" 트리거 대기)
 
 - **P1 (아키텍처 §4, 치명)**: BM25 레그 교체 — ParadeDB 제거 → Supabase 네이티브 tsvector(GIN)+pgvector+RRF. 한국어 렉시컬 = pg_trgm/`simple`. 스케일아웃 경로 = 외부 엔진(Meilisearch/Typesense). "한국어 하이브리드 검색"을 경쟁 공백 항목으로 사업성분석에 교차 등재.
 - **P2 (아키텍처 §5·§1, UX 중대)**: 결정 인박스 역전 — 기본 자동 기록+undo+주간 changelog, 승인은 충돌·교차 스코프 접근만, 미드태스크 인터럽트 금지.
 - **P3 (아키텍처 §3)**: Anthropic 디렉토리 등재 = 출시 요건(심사 2주~수개월 예산), 연결 직후 도구 발화 self-test 단계 추가.
-- **P4 (아키텍처 §6)**: 리랭커 1순위 Voyage rerank-2.5-lite(zerank-2는 라이선스 협의 항목으로 강등), 임베딩에 "한국어 자체 벤치 통과" 게이트 + Embedding 2 비호환·배치 500k 캡 주석, Flash-Lite **2.5 모델 핀**.
+- **P4 (아키텍처 §6)**: 리랭커 1순위 Voyage rerank-2.5-lite(zerank-2는 라이선스 협의 항목으로 강등), 임베딩에 "한국어 자체 벤치 통과" 게이트 + Embedding 2 비호환·배치 500k 캡 주석, Flash-Lite **2.5 모델 핀**. *(→ P8 재교체: 리랭커 1순위 = Qwen3-Reranker, 임베딩 기본값 = bge-m3; Voyage·Gemini는 벤치 게이트 뒤로.)*
 - **P5 (아키텍처 §3)**: Hyperdrive/커넥션 풀링 명시.
 - **P6 (아키텍처 §8)**: 실험 항목 추가 — **웹 표면 도구 호출률 계측**(지침 스니펫 유/무 A/B). Tasks API 사용 금지 주석.
 - **P7 (사업성분석 §4·§8)**: 반증 패턴("플랫폼 흡수+시장 무관심") 등재, N4 웜스타트 창 축소(벤더 임포트 무기화) 주석, 서사 집중 = N2 오염+N3 감사(플랫폼 인센티브 충돌 지점), 부패도 리포트 = 공유형 재미 톤.

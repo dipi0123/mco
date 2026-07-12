@@ -162,7 +162,7 @@ sequenceDiagram
 | 역할 | 확정 기본값 (근거) | 벤치 게이트 대기 / 잠정 |
 |---|---|---|
 | 추출 LLM (쓰기 ①~④) | **Gemini 2.5 Flash-Lite 핀** — $0.10/$0.40 per 1M, 구조화 출력 100% 유효 JSON, 유사 서비스가 파인튜닝해 프로덕션 운용하는 베이스. 3.1 Flash-Lite는 비용 2.5~3.75×라 핀 고정 | ⚠️ 핀 자체가 **한국어+코드스위칭 자체 벤치 게이트 조건부**(한국어 공개 벤치 부재). 증거 기반 스왑 후보 = GPT-5-mini(KMMLU 76.47 실측), 대안 GPT-5-nano |
-| 임베딩 | **bge-m3** — 한국어 실증(Ko-MTEB IR 79.30, recall@10 0.792) + 관리형 실재(DeepInfra $0.01/1M·Workers AI $0.012/1M) = Gemini 대비 1/15 비용. MRL 1024 | Gemini embedding · voyage-4-lite(둘 다 한국어 공개 실측 0) · KURE-v1(+1.5 NDCG이나 관리형 호스트 없음) — **자체 한국어 벤치에서 이기면 승격** |
+| 임베딩 | **bge-m3** — 한국어 실증(Ko-MTEB IR 79.30, recall@10 0.792) + 관리형 실재(DeepInfra $0.01/1M·Workers AI $0.012/1M) = Gemini 대비 1/15 비용. MRL 1024 | Gemini embedding · voyage-4-lite(둘 다 한국어 공개 실측 0) · KURE-v1(+1.5 NDCG이나 관리형 호스트 없음) · Qwen3-Embedding-0.6B/4B(Apache-2.0·MRL, 한국어 공개 실측 얇음) — **자체 한국어 벤치에서 이기면 승격** |
 | 리랭커 | **Qwen3-Reranker-0.6B/4B** — 한국어 18,945쿼리 실측 1위(4B MRR@10 0.8324, 0.6B 0.8095), DeepInfra $0.01/1M, Apache-2.0. 폴백 = bge-reranker-v2-m3(0.8113, 한국어 실전 최다) | Voyage rerank-2.5-lite(한국어 공개 실측 0) — 자체 벤치 승격제. zerank-2 = 비상업 라이선스, 협의 항목(선택). LLM 리스트와이즈 리랭킹은 실시간 금지(1–3s+) |
 
 참고: 위 기본값들의 승격/스왑 판정은 전부 **구현 전 API 수준의 한국어 부품 벤치 3건**(리랭커·임베딩·추출)에 걸려 있다 — 목록·하네스는 [인프라 구축](MCO_인프라구축_v0_1.md) §9. 라벨이 축적된 뒤의 자체 파인튜닝 경로도 인프라 문서 §7 참조.

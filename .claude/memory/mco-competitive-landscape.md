@@ -11,7 +11,7 @@ metadata:
 - **종합 평결**: "함대 공유 메모리 + 실패 지식 자산화 + 크로스 벤더 중립층"을 모두 하는 곳 없음. 브리핑 팩 프리미티브는 어디에도 없음. 차별화는 존재가 아니라 **조합 완성도**.
 - **개념 검증 사례**: Devin Knowledge의 제안→승인 게이트(= 가치 판단 게이트의 벤더 내부판), Google ReasoningBank(실패 궤적 증류 — 연구 단계, 제품화 전 = 타이밍 창구), Zep Graphiti bi-temporal 무효화(출처·TTL 부품). AgentCore Gateway = 시맨틱 툴 선택의 인프라 내재화('저장<선택' 원리의 벤더 내부판, 툴 대상).
 - **위협 지도**: 1티어 mem0("Plaid for memory" 비전 선점, $24M, AWS 채널)·Anthropic(memory tool GA + Managed Agents 스코프 메모리)·AWS(Bedrock AgentCore: 장·단기 메모리+Gateway 시맨틱 툴 선택+가드레일, Strands 결합 — 담장 안 풀스택, 벤더 횡단 구조적 불가) / 2티어 Supermemory·XTrace·ByteRover·Cipher / 3티어 Engram($98M, 조직 학습형).
-- **감시 항목**: OpenAI 메모리 API(출시 시 논거 재점검), AAIF 메모리 표준화, mem0 스코프 추가, Managed Agents 외부 개방 · AgentCore 메모리의 벤더 횡단 개방 여부.
+- **감시 항목**: OpenAI 메모리 API(출시 시 논거 재점검), AAIF 메모리 표준화, mem0 스코프 추가, Managed Agents 외부 개방 · AgentCore 메모리의 벤더 횡단 개방 여부. (분기 점검 취합 정본: [[mco-watchlist]])
 
 **Why:** 경쟁력 주장의 증거 기반. "세계 최초 크로스 플랫폼 메모리" 류 주장은 이제 불가 — 조합으로 말해야 함. '빅테크가 짜쳐서 안 함' 프레임도 사실과 달라짐 [[mco-positioning-bigtech-gap]].
 

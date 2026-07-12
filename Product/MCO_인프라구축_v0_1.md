@@ -148,7 +148,7 @@ sequenceDiagram
 
 | # | 항목 | 상태 | 판정 수단 |
 |---|---|---|---|
-| 1 | 한국어 부품 벤치 3건 — ⓐ 리랭커(Qwen3 vs bge-reranker vs Voyage) ⓑ 임베딩(bge-m3 vs Gemini vs voyage-lite vs KURE) ⓒ 추출(Flash-Lite vs GPT-5-nano/mini, 한·영 코드스위칭 + 출력 언어·스키마 assert) | **벤치 게이트 대기** | 공개 하네스 재사용(instructkr·AutoRAGRetrieval·Ko-StrategyQA·KURE) — 구현 전 API 수준 |
+| 1 | 한국어 부품 벤치 3건 — ⓐ 리랭커(Qwen3 vs bge-reranker vs Voyage) ⓑ 임베딩(bge-m3 vs Gemini vs voyage-lite vs KURE vs Qwen3-Embedding) ⓒ 추출(Flash-Lite vs GPT-5-nano/mini, 한·영 코드스위칭 + 출력 언어·스키마 assert) | **벤치 게이트 대기** | 공개 하네스 재사용(instructkr·AutoRAGRetrieval·Ko-StrategyQA·KURE) — 구현 전 API 수준 |
 | 2 | 게이트·선택 정밀도 실험 | **관문 (유일한 미검증 코어)** | 베이스라인 = full-context와 BM25 둘 다, 킬 기준 +10점, 기권(abstain) 클래스 포함, 한국어 슬라이스 별도 채점, 점수는 토큰/쿼리·p95와 쌍으로 보고 |
 | 3 | 웹 표면 호출률 A/B | 실험 대기 | 지침 스니펫 유/무 비교 — 대시보드 recall-rate 지표의 기준선 |
 | 4 | 한글 trigram 1일차 검증 | 배포 시 절차 | `show_trgm('공원')` 비어 있지 않음 확인 |
