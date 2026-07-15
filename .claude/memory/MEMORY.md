@@ -28,6 +28,7 @@
 - [Security model: trifecta controls](mco-security-model.md) — 전제: MCO = lethal trifecta 정중앙(민감 메모리 × 비신뢰 유래 write-back × 외부 통신 주입), 방어 본체 = 아키텍처 제약; 통제 6항(신뢰 티어링·write-back 스코프 고정·스캔=보조·대시보드 IAP 게이트·신뢰 헤더 규율·제로 상태 테스트) = 차터 §9 #6·인프라 §9 #5 확정 입력.
 - [Ideation 2026-07-11](mco-ideation-2026-07-11.md) — 페인 서열(오염>무영향>부재); 발산 14 재배치(⑨⑩=슬롯 자산, ②⑥=출력 앱); 기각 기록(회의 수확기→회의 전 브리핑 반전, GB 구독, 에스크로 보류).
 - [Manufacturing positioning](mco-manufacturing-positioning.md) — 제조 GTM: 'LLM 독립형 메모리 레이어' 표현 금지 → '설비·품질·작업자 이력을 기억하고 상황 맞는 과거 사례를 꺼내주는 제조 메모리 컨텍스트'(Factory Memory Context).
+- [Scope expansion: personal→team](mco-scope-expansion-team.md) — 2026-07-15: MVP 개인 우선, 이후 팀/공유 프로젝트 스코프 확장(적층·선택 해자·write-back 거버넌스·가드레일·랜드앤익스팬드); 미결=공유 소유 모델. 계기=퇴근길 AI 영상.
 
 ## 워크플로
 
